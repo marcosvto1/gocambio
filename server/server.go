@@ -119,7 +119,6 @@ func ConsultarCotacao() (*Cotacao, error) {
 		return nil, err
 	}
 
-
 	var cotacao Cotacao
 	err = json.Unmarshal(body, &cotacao)
 	if err != nil {
