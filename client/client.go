@@ -2,18 +2,38 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
 )
+
+type CotacaoValue struct {
+	Code string `json:"code"`
+	CodeIn string `json:"codein"`
+	Name string `json:"name"`
+	High string `json:"high"`
+	Low string `json:"low"`
+	VarBid string `json:"varBid"`
+	PctChange string `json:"pctChange"`
+	Bid string `json:"bid"`
+	Ask string `json:"Ask"`
+	Timestamp string `json:"timestamp"`
+	CreateDate string `json:"create_date"`
+}
+
+type Cotacao struct {
+	USDBRL CotacaoValue
+}
 
 func main() {
 	ctx := context.Background()
 	ctx, cancel := context.WithTimeout(ctx, time.Millisecond * 300)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, "GET", "", nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", "http://localhost:8081/cotacao", nil)
 	if err != nil {
 		panic(err)
 	}
@@ -29,5 +49,22 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(string(body))
+	arquivo, err := os.OpenFile("cotacao.txt", os.O_WRONLY, os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+
+	var cotacao Cotacao
+	err = json.Unmarshal(body, &cotacao)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Dólar: %v \n", cotacao.USDBRL.Bid)
+
+	_, err = arquivo.WriteString("Dólar: "+ cotacao.USDBRL.Bid)
+	arquivo.Close()
+	if err != nil {
+		panic(err)
+	}
 }
