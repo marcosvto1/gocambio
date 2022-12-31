@@ -110,7 +110,7 @@ func ConsultarCotacao() (*Cotacao, error) {
 	fmt.Println("* Consultando Cotação.")
 
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 200 * time.Nanosecond)
+	ctx, cancel := context.WithTimeout(ctx, 200 * time.Millisecond)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, "GET", "https://economia.awesomeapi.com.br/json/last/USD-BRL", nil)
