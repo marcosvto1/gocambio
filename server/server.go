@@ -80,7 +80,7 @@ func SalvarCotacao(s *Server, cotacao *Cotacao) (error) {
 	fmt.Println("* Salvando Cotação.")
 
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 10 * time.Nanosecond)
+	ctx, cancel := context.WithTimeout(ctx, 10 * time.Millisecond)
 	defer cancel()
 
 	stmt, err := s.DB.PrepareContext(ctx,"INSERT INTO cotacoes (result,data_cotacao) VALUES (?, ?)")
