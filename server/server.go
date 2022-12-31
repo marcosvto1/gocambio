@@ -35,6 +35,11 @@ type Server struct {
 	DB *sql.DB
 }
 
+type ErrorMessage struct {
+	Message string `json:"message"`
+}
+
+
 func main() {
 	db, err := sql.Open("sqlite3", "cotacoes.db")
 	if err != nil {
@@ -49,19 +54,25 @@ func main() {
 }
 
 func (s *Server) ConsultarCotacaoDolarHandle(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var errorMessage ErrorMessage
+
 	cotacao, err := ConsultarCotacao()
 	if err != nil {
 		w.WriteHeader(http.StatusBadGateway)
+		errorMessage.Message = err.Error()
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 
 	err = SalvarCotacao(s, cotacao)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		errorMessage.Message = err.Error()
+		json.NewEncoder(w).Encode(errorMessage)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(&cotacao)
 }
 
@@ -99,7 +110,7 @@ func ConsultarCotacao() (*Cotacao, error) {
 	fmt.Println("* Consultando Cotação.")
 
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 200 * time.Millisecond)
+	ctx, cancel := context.WithTimeout(ctx, 200 * time.Nanosecond)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, "GET", "https://economia.awesomeapi.com.br/json/last/USD-BRL", nil)
