@@ -80,12 +80,11 @@ func SalvarCotacao(s *Server, cotacao *Cotacao) (error) {
 	fmt.Println("* Salvando Cotação.")
 
 	ctx := context.Background()
-	ctx, cancel := context.WithTimeout(ctx, 10 * time.Millisecond)
+	ctx, cancel := context.WithTimeout(ctx, 10 * time.Nanosecond)
 	defer cancel()
 
 	stmt, err := s.DB.PrepareContext(ctx,"INSERT INTO cotacoes (result,data_cotacao) VALUES (?, ?)")
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 
@@ -93,13 +92,11 @@ func SalvarCotacao(s *Server, cotacao *Cotacao) (error) {
 
 	res, err := json.Marshal(cotacao)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 
 	_, err = stmt.ExecContext(ctx, res, time.Now())
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 
